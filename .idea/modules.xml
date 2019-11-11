@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/jaegertracing.iml" filepath="$PROJECT_DIR$/jaegertracing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/jaegertracing-provider/jaegertracing-provider.iml" filepath="$PROJECT_DIR$/src/jaegertracing-provider/jaegertracing-provider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/jaegertracing-service/jaegertracing-service.iml" filepath="$PROJECT_DIR$/src/jaegertracing-service/jaegertracing-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/jaegertracing-verify/jaegertracing-verify.iml" filepath="$PROJECT_DIR$/src/jaegertracing-verify/jaegertracing-verify.iml" />
+    </modules>
+  </component>
+</project>
