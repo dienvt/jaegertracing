@@ -1,4 +1,4 @@
-package cps.demo.jeagertracingservice;
+package cps.demo.jaegertracingservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
