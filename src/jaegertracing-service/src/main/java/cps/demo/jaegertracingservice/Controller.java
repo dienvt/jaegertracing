@@ -3,9 +3,9 @@ package cps.demo.jaegertracingservice;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import cps.demo.jaegertracingservice.activemq.ActiveMQProducer;
-import cps.demo.jaegertracingservice.carrier.ActiveMQCarrier;
 import cps.demo.jaegertracingservice.carrier.RequestBuilderCarrier;
 import cps.demo.jaegertracingservice.entity.*;
+import cps.demo.jaegertracingsharelib.carrier.HttpRequestInjectAdapter;
 import io.jaegertracing.Configuration;
 import io.jaegertracing.internal.JaegerTracer;
 import io.opentracing.Scope;
@@ -93,15 +93,15 @@ public class Controller {
 
             rootSpan.log("verify request");
             Span verifySpan = tracer.buildSpan("/verify/accesstoken").asChildOf(rootSpan).start();
-            verifySpan.log("");
-            Thread.sleep(500L);
+            verifySpan.log("send verify");
+            callVerify(verifySpan);
             verifySpan.finish();
 
             rootSpan.log(ImmutableMap.of("event", "call deliver"));
             Span deliverSpan = tracer.buildSpan("/provider/deliver").asChildOf(rootSpan).start();
             deliverSpan.setTag("providerCode", "PAYOO");
 
-            ProviderResponse response = callProvider(dataRequest.getOrderid(), deliverSpan);
+            ProviderResponse response = callProviderv2(dataRequest.getOrderid(), deliverSpan);
 
             deliverSpan.finish();
 
@@ -120,18 +120,35 @@ public class Controller {
                         .build();
             }
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return BaseResponse.builder()
-                    .returnCode(0)
-                    .returnMessage("exception")
-                    .build();
         } finally {
             activeMQProducer.sendMessage("orderlog", "mockOrderInfo", rootSpan);
 
             if (rootSpan != null) {
                 rootSpan.finish();
             }
+        }
+    }
+
+    private void callVerify(Span verifySpan) {
+        HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead
+        String url = "http://localhost:8020/verify";
+        try {
+            StringEntity params = new StringEntity("");
+            RequestBuilder requestBuilder = RequestBuilder.post()
+                    .addHeader("content-type", "application/json")
+                    .setUri(url)
+                    .setEntity(params);
+
+            verifySpan.setTag(Tags.HTTP_METHOD, "POST");
+            verifySpan.setTag(Tags.HTTP_URL, url);
+            HttpUriRequest request = requestBuilder.build();
+            tracer.inject(verifySpan.context(), Format.Builtin.HTTP_HEADERS, new HttpRequestInjectAdapter(request));
+
+
+            HttpResponse httpResponse = httpClient.execute(request);
+            String response = IOUtils.toString(httpResponse.getEntity().getContent(), "UTF-8");
+        } catch (Exception ex) {
+
         }
     }
 
@@ -163,5 +180,34 @@ public class Controller {
         }
         return null;
 
+    }
+
+    private ProviderResponse callProviderv2(String orderId, Span deliverSpan) {
+
+        HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead
+        String url = "http://localhost:8010/provider/deliver";
+        try {
+            StringEntity params = new StringEntity(gson.toJson(ProviderDeliverRequest.builder().orderId(orderId).build()));
+            RequestBuilder requestBuilder = RequestBuilder.post()
+                    .addHeader("content-type", "application/json")
+                    .setUri(url)
+                    .setEntity(params);
+
+            deliverSpan.setTag(Tags.HTTP_METHOD, "POST");
+            deliverSpan.setTag(Tags.HTTP_URL, url);
+            HttpUriRequest request = requestBuilder.build();
+
+            tracer.inject(deliverSpan.context(), Format.Builtin.HTTP_HEADERS, new HttpRequestInjectAdapter(request));
+
+            HttpResponse httpResponse = httpClient.execute(request);
+            String response = IOUtils.toString(httpResponse.getEntity().getContent(), "UTF-8");
+            return gson.fromJson(response, ProviderResponse.class);
+        } catch (Exception ex) {
+
+        } finally {
+            //Deprecated
+            //httpClient.getConnectionManager().shutdown();
+        }
+        return null;
     }
 }

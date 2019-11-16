@@ -3,6 +3,7 @@ package cps.demo.jaegertracingprovider;
 import com.google.common.collect.ImmutableMap;
 import cps.demo.jaegertracingprovider.entity.ProviderDeliverRequest;
 import cps.demo.jaegertracingprovider.entity.ProviderResponse;
+import cps.demo.jaegertracingsharelib.carrier.HttpRequestExtractAdapter;
 import io.jaegertracing.internal.JaegerTracer;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
@@ -32,10 +33,10 @@ public class Controller {
     @RequestMapping(value = "/provider/deliver", method = RequestMethod.POST)
     public ProviderResponse deliver(@RequestHeader Map<String, String> headers, @RequestBody ProviderDeliverRequest dataRequest, HttpServletRequest request) {
 
-//        Span rootSpan = tracer.buildSpan("POST:/provider/deliver")
+        //        Span rootSpan = tracer.buildSpan("POST:/provider/deliver")
 //                .addReference(References.FOLLOWS_FROM, dataRequest.getSpanContext())
 //                .start();
-        Span rootSpan = startServerSpan(headers, "POST:/provider/deliver");
+        Span rootSpan = startServerSpanv2(request, "POST:/provider/deliver");
         ProviderResponse response = new ProviderResponse();
 
 //        SpanContext context = new JaegerSpanContext()
@@ -95,6 +96,22 @@ public class Controller {
         Tracer.SpanBuilder spanBuilder;
         try {
             SpanContext parentSpan = tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMapAdapter(headers));
+            if (parentSpan == null) {
+                spanBuilder = tracer.buildSpan(operationName);
+            } else {
+                spanBuilder = tracer.buildSpan(operationName).asChildOf(parentSpan);
+            }
+        } catch (IllegalArgumentException e) {
+            spanBuilder = tracer.buildSpan(operationName);
+        }
+        return spanBuilder.withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER).start();
+    }
+
+    public Span startServerSpanv2(HttpServletRequest request, String operationName) {
+
+        Tracer.SpanBuilder spanBuilder;
+        try {
+            SpanContext parentSpan = tracer.extract(Format.Builtin.HTTP_HEADERS, new HttpRequestExtractAdapter(request));
             if (parentSpan == null) {
                 spanBuilder = tracer.buildSpan(operationName);
             } else {

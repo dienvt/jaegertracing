@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>jaegertracing-share-lib</module>
         <module>jaegertracing-verify</module>
         <module>jaegertracing-service</module>
         <module>jaegertracing-provider</module>
@@ -20,20 +21,43 @@
         <starter.version>2.2.1.RELEASE</starter.version>
         <lombok.version>1.18.10</lombok.version>
         <jaeger.version>1.0.0</jaeger.version>
+        <shared.lib.version>1.0-SNAPSHOT</shared.lib.version>
     </properties>
     <dependencyManagement>
         <dependencies>
 
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-activemq</artifactId>
-                <version>${starter.version}</version>
+                <groupId>cps.demo</groupId>
+                <artifactId>jaegertracing-share-lib</artifactId>
+                <version>${shared.lib.version}</version>
             </dependency>
+
+            <!--            <dependency>-->
+            <!--                <groupId>org.slf4j</groupId>-->
+            <!--                <artifactId>slf4j-log4j12</artifactId>-->
+            <!--                <version>1.7.26</version>-->
+            <!--            </dependency>-->
+
+            <!--            <dependency>-->
+            <!--                <groupId>org.apache.activemq</groupId>-->
+            <!--                <artifactId>activemq-all</artifactId>-->
+            <!--                <version>5.15.4</version>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-broker</artifactId>
                 <version>5.15.10</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-client</artifactId>
+                <version>5.15.10</version>
+            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>org.apache.activemq</groupId>-->
+            <!--                <artifactId>activemq-broker</artifactId>-->
+            <!--                <version>5.15.10</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>commons-io</groupId>
@@ -79,6 +103,12 @@
                 <version>${starter.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-activemq</artifactId>
+                <version>${starter.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -86,18 +116,18 @@
                 <version>${lombok.version}</version>
                 <optional>true</optional>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${starter.version}</version>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.junit.vintage</groupId>
-                        <artifactId>junit-vintage-engine</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-starter-test</artifactId>-->
+            <!--                <version>${starter.version}</version>-->
+            <!--                <scope>test</scope>-->
+            <!--                <exclusions>-->
+            <!--                    <exclusion>-->
+            <!--                        <groupId>org.junit.vintage</groupId>-->
+            <!--                        <artifactId>junit-vintage-engine</artifactId>-->
+            <!--                    </exclusion>-->
+            <!--                </exclusions>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcomponents-client</artifactId>

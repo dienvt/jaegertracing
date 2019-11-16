@@ -9,5 +9,4 @@ public class JeagertracingServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(JeagertracingServiceApplication.class, args);
     }
-
 }
