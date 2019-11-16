@@ -53,7 +53,7 @@ public class AppConfiguration {
 //        System.setProperty(Configuration.JAEGER_SENDER_FACTORY, "");
 //        System.setProperty(Configuration.JAEGER_TRACEID_128BIT, "");
 
-        Configuration.SamplerConfiguration samplerConfig = Configuration.SamplerConfiguration.fromEnv().withType("const").withParam(1);
+        Configuration.SamplerConfiguration samplerConfig = Configuration.SamplerConfiguration.fromEnv().withType("const").withParam(0);
         Configuration.ReporterConfiguration reporterConfig = Configuration.ReporterConfiguration.fromEnv().withLogSpans(true);
         Configuration config = new Configuration("jaeger-provider").withSampler(samplerConfig).withReporter(reporterConfig);
         return config.getTracer();

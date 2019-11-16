@@ -122,10 +122,10 @@ public class Controller {
 
         } finally {
             activeMQProducer.sendMessage("orderlog", "mockOrderInfo", rootSpan);
-
             if (rootSpan != null) {
                 rootSpan.finish();
             }
+
         }
     }
 
